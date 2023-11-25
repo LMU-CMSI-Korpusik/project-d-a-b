@@ -37,7 +37,6 @@ def featurize():
     np.save("data/features.npy", features)
 
 
-# TODO finish generating only the essay text features
 def featurize_essay_text() -> (np.ndarray, np.ndarray):    
     train_essays = pd.read_csv("data/train_essays.csv")
     essay_texts = train_essays["text"]
@@ -48,7 +47,7 @@ def featurize_essay_text() -> (np.ndarray, np.ndarray):
     for index, essay in enumerate(essay_texts):
         essay_text_features = CountVectorizer().fit([essay]).transform([essay])
         features[index,:] = np.array([essay_text_features], dtype="object")
-    
+        
     np.save("data/essay_features.npy", features)
     np.save("data/generated.npy", generated)
     return (features, generated)
