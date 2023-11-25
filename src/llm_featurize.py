@@ -25,8 +25,9 @@ def create_features():
             index += 1
             
     # print(features)
-
-    human_essays = pd.read_csv("data/train_essays.csv")["text"].to_numpy()
+    human_essays_all_prompts = pd.read_csv("data/train_essays.csv")
+    human_essays = human_essays_all_prompts.loc[human_essays_all_prompts["prompt_id"] == 0]["text"].to_numpy()
+    # human_essays = pd.read_csv("data/train_essays.csv")["text"].to_numpy()
     human_features = np.zeros(num_llm_essays, dtype="object") 
 
     index = 0
