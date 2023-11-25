@@ -15,8 +15,11 @@ y = label_encoder.fit_transform(y)
 # print(y)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-clf = RandomForestClassifier(n_estimators=200, max_depth=2, random_state=0)
-clf.fit(X_train, y_train)
-y_pred = clf.predict(X_test)
+average_accuracy = 0
+for i in range(100):
+    clf = RandomForestClassifier(n_estimators=200, max_depth=2, random_state=0)
+    clf.fit(X_train, y_train)
+    y_pred = clf.predict(X_test)
+    average_accuracy += accuracy_score(y_test, y_pred)
 
-print(accuracy_score(y_test, y_pred))
+print(average_accuracy / 100)
