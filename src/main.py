@@ -6,17 +6,20 @@ from models.naive_bayes import naive_bayes
 
 def main():
     print("========== Testing Models ==========")
-    random_forest_accuracy = random_forest()
-    print("Random Forest Accuracy:", random_forest_accuracy)
+    print("Running 100 trials for each model")
+    print("Accuracy, Precision, Recall, F1")
+    print("====================================")
+    random_scores = random_forest()
+    print("Random Forest Scores:", random_scores)
     
-    svm_accuracy = svm_model()
-    print("SVM Accuracy:", svm_accuracy)
+    svm_scores = svm_model()
+    print("SVM Scores:", svm_scores)
     
-    perceptron_accuracy = perceptron()
-    print("Perceptron Accuracy:", perceptron_accuracy)
+    perceptron_scores = perceptron()
+    print("Perceptron Scores:", perceptron_scores)
     
-    nb_accuracy = naive_bayes()
-    print("Naive Bayes Accuracy:", nb_accuracy)
+    nb_scores = naive_bayes()
+    print("Naive Bayes Scores:", nb_scores)
     print("========== Completed ==========")
 
 if __name__ == "__main__":
