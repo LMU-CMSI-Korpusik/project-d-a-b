@@ -1,3 +1,9 @@
+"""
+Function containing Random Forest classifier model for the dataset.
+
+Returns the average accuracy, precision, recall, and f1 score of the model over 100 trials.
+"""
+
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier

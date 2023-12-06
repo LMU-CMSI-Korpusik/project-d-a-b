@@ -1,3 +1,11 @@
+"""
+Extracts features from the LLM essays and human essays and saves them in a numpy array.
+
+Saves the features and binary labels in data/all_features_X_y.npy.
+
+Does not return a value.
+"""
+
 import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer

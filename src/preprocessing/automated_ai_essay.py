@@ -1,3 +1,7 @@
+"""
+Script to generate an essay using the GPT-3.5 API and append it to the training data in csv format.
+"""
+
 from openai import OpenAI
 import csv
 import os

@@ -1,3 +1,11 @@
+"""
+This script is used to train a sequential neural network model.
+
+Displays the classification report and confusion matrix of the model.
+
+Does not return a value.
+"""
+
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Embedding, LSTM, Dense, Dropout
 from sklearn.model_selection import train_test_split

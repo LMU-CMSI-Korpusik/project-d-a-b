@@ -1,3 +1,11 @@
+"""
+This script is used to train a neural network model using the BERT model.
+
+Plots the training and validation accuracy and loss over the epochs.
+
+Does not return a value.
+"""
+
 from transformers import BertTokenizer, TFBertForSequenceClassification
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Embedding, Flatten, Dense

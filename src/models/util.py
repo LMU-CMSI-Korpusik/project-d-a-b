@@ -1,3 +1,13 @@
+"""
+Util functions called by the base models in src/models.
+
+load_and_split_data: Loads the data from data/all_features_X_y.npy and splits it into training and testing sets.
+
+score: Returns the accuracy, precision, recall, and f1 score of the model.
+
+graph_features: Graphs the features of the dataset using PCA.
+"""
+
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split

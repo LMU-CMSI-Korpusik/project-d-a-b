@@ -1,3 +1,10 @@
+"""
+Function containing Naive Bayes classifier model for the dataset.
+
+Returns the average accuracy, precision, recall, and f1 score of the model over 100 trials.
+"""
+
+
 from sklearn.naive_bayes import GaussianNB
 from models.util import load_and_split_data, score
 

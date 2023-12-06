@@ -1,3 +1,9 @@
+"""
+Function containing Naive Support Vector Machine model for the dataset.
+
+Returns the average accuracy, precision, recall, and f1 score of the model over 100 trials.
+"""
+
 import pandas as pd
 import numpy as np
 from sklearn import svm

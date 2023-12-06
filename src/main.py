@@ -1,3 +1,7 @@
+"""
+Script to run all base models and display the accuracy, precision, recall, and f1 score of each model.
+"""
+
 from models.random_forest import random_forest
 from models.svm import svm_model
 from models.perceptron import perceptron

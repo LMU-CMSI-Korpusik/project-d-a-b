@@ -1,3 +1,9 @@
+"""
+Converts a text file of essays to a CSV file with the following format:
+    label, text, generated
+"""
+    
+
 import csv
 import os
 
