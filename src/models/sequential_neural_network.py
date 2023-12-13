@@ -18,81 +18,114 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import classification_report, confusion_matrix
 import seaborn as sns
 
-train_essays = pd.read_csv("data/train_essays.csv").head(555)
-train_essays_generated = pd.read_csv("data/train_essays_llm_555.csv")
 
-common_columns = set(train_essays.columns).intersection(
-    train_essays_generated.columns)
+def load_data():
+    train_essays = pd.read_csv("data/train_essays.csv").head(555)
+    train_essays_generated = pd.read_csv("data/train_essays_llm_555.csv")
 
-df1 = train_essays[common_columns]
-df2 = train_essays_generated[common_columns]
+    common_columns = set(train_essays.columns).intersection(
+        train_essays_generated.columns)
 
-combined_df = pd.concat([df1, df2], ignore_index=True)
-data_texts = combined_df['text'].tolist()
-data_labels = combined_df['generated'].astype(int).tolist()
+    df1 = train_essays[common_columns]
+    df2 = train_essays_generated[common_columns]
 
-vocab_size = 20000
-embedding_dim = 100
-max_length = 512
+    combined_df = pd.concat([df1, df2], ignore_index=True)
+    data_texts = combined_df['text'].tolist()
+    data_labels = combined_df['generated'].astype(int).tolist()
+    return data_texts, data_labels
 
-tokenizer_seq = Tokenizer(oov_token="<OOV>")
-tokenizer_seq.fit_on_texts(data_texts)
 
-train_sequences = tokenizer_seq.texts_to_sequences(data_texts)
+def preprocess(data_texts, data_labels, max_length=512):
+    tokenizer_seq = Tokenizer(oov_token="<OOV>")
+    tokenizer_seq.fit_on_texts(data_texts)
 
-train_padded = pad_sequences(
-    train_sequences, maxlen=max_length, padding='post', truncating='post')
+    train_sequences = tokenizer_seq.texts_to_sequences(data_texts)
 
-label_encoder = LabelEncoder()
-train_labels_encoded = label_encoder.fit_transform(data_labels)
+    train_padded = pad_sequences(
+        train_sequences, maxlen=max_length, padding='post', truncating='post')
 
-model = Sequential([
-    Embedding(input_dim=vocab_size, output_dim=embedding_dim,
-              input_length=max_length),
-    LSTM(128),
-    Dropout(0.5),
-    Dense(2, activation='softmax')
-])
+    label_encoder = LabelEncoder()
+    train_labels_encoded = label_encoder.fit_transform(data_labels)
+    return train_padded, train_labels_encoded, label_encoder
 
-model.compile(optimizer='adam',
-              loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-train_padded, val_padded, train_labels_encoded, val_labels_encoded = train_test_split(
-    train_padded, train_labels_encoded, test_size=0.2, random_state=42
-)
+def build_model(vocab_size=20000, embedding_dim=100, max_length=512):
+    model = Sequential([
+        Embedding(input_dim=vocab_size, output_dim=embedding_dim,
+                  input_length=max_length),
+        LSTM(128),
+        Dropout(0.5),
+        Dense(2, activation='softmax')
+    ])
 
-history = model.fit(
-    x=train_padded,
-    y=train_labels_encoded,
-    epochs=4,
-    validation_data=(val_padded, val_labels_encoded)
-)
+    model.compile(optimizer='adam',
+                  loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+    return model
 
-eval_results = model.evaluate(val_padded, val_labels_encoded)
-print("Test Accuracy:", eval_results[1])
 
-predictions = model.predict(val_padded)
-predicted_labels = np.argmax(predictions, axis=1)
+def train_model(model, train_padded, train_labels_encoded, val_padded, val_labels_encoded):
+    history = model.fit(
+        x=train_padded,
+        y=train_labels_encoded,
+        epochs=4,
+        validation_data=(val_padded, val_labels_encoded)
+    )
+    return history
 
-predicted_labels_original = label_encoder.inverse_transform(predicted_labels)
-test_labels_original = label_encoder.inverse_transform(val_labels_encoded)
 
-print("Classification Report:")
-print(classification_report(test_labels_original, predicted_labels_original))
+def evaluate_model(model, label_encoder, val_padded, val_labels_encoded):
+    eval_results = model.evaluate(val_padded, val_labels_encoded)
+    print("Test Accuracy:", eval_results[1])
 
-cm = confusion_matrix(test_labels_original, predicted_labels_original)
-plt.figure(figsize=(8, 6))
-sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
-            xticklabels=label_encoder.classes_, yticklabels=label_encoder.classes_)
-plt.title('Confusion Matrix')
-plt.xlabel('Predicted')
-plt.ylabel('True')
-plt.show(block=True)
+    predictions = model.predict(val_padded)
+    predicted_labels = np.argmax(predictions, axis=1)
 
-plt.plot(history.history['accuracy'])
-plt.plot(history.history['val_accuracy'])
-plt.title('Model Accuracy')
-plt.xlabel('Epoch')
-plt.ylabel('Accuracy')
-plt.legend(['Train', 'Validation'], loc='upper left')
-plt.show(block=True)
+    predicted_labels_original = label_encoder.inverse_transform(
+        predicted_labels)
+    test_labels_original = label_encoder.inverse_transform(val_labels_encoded)
+
+    print("Classification Report:")
+    print(classification_report(test_labels_original, predicted_labels_original))
+    return predicted_labels_original, test_labels_original
+
+
+def plot_data(history, test_labels_original, predicted_labels_original, label_encoder):
+    cm = confusion_matrix(test_labels_original, predicted_labels_original)
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
+                xticklabels=label_encoder.classes_, yticklabels=label_encoder.classes_)
+    plt.title('Confusion Matrix')
+    plt.xlabel('Predicted')
+    plt.ylabel('True')
+    plt.show(block=True)
+
+    plt.plot(history.history['accuracy'])
+    plt.plot(history.history['val_accuracy'])
+    plt.title('Model Accuracy')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.legend(['Train', 'Validation'], loc='upper left')
+    plt.show(block=True)
+
+
+def main():
+    data_texts, data_labels = load_data()
+    # parameters:
+    vocab_size = 20000
+    embedding_dim = 100
+    max_length = 512
+    train_padded, train_labels_encoded, label_encoder = preprocess(
+        data_texts, data_labels, max_length)
+    model = build_model(vocab_size, embedding_dim, max_length)
+    train_padded, val_padded, train_labels_encoded, val_labels_encoded = train_test_split(
+        train_padded, train_labels_encoded, test_size=0.2, random_state=42)
+    history = train_model(model, train_padded,
+                          train_labels_encoded, val_padded, val_labels_encoded)
+    predicted_labels_original, test_labels_original = evaluate_model(
+        model, label_encoder, val_padded, val_labels_encoded)
+    plot_data(history, test_labels_original,
+              predicted_labels_original, label_encoder)
+
+
+if __name__ == "__main__":
+    main()
